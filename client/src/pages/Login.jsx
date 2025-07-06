@@ -20,6 +20,7 @@ import {
 import { useEffect, useState } from "react"
 import { useLoginUserMutation, useRegisterUserMutation } from "@/features/api/authApi"
 import { toast } from "sonner"
+import { useNavigate } from "react-router-dom"
 
 const Login = () => {
     const [loginInput, setLoginInput] = useState({
@@ -34,6 +35,8 @@ const Login = () => {
 
     const [registerUser, {data: registerData, error: registerError, isLoading: registerIsLoading, isSuccess: registerIsSucces}] = useRegisterUserMutation();
     const [loginUser, {data: loginData, error: loginError, isLoading: loginIsLoading, isSuccess: loginIsSucces}] = useLoginUserMutation();
+
+    const navigate = useNavigate();
 
     const changeInputHandler = (e, type) =>{
         const {name, value} = e.target;
@@ -64,6 +67,7 @@ const Login = () => {
       }
       if(loginIsSucces && loginData){
         toast.success(loginData.message || "Welcome Back !!")
+        navigate("/");
       }
       if(loginError){
         toast.error(loginData?.data?.message || "Check Email or Password !!")
@@ -71,8 +75,8 @@ const Login = () => {
     }, [loginData, registerData, loginError, registerError, loginIsLoading, registerIsLoading])
   return (
     <div className="flex items-center justify-center w-full mt-18">
-      <Tabs defaultValue="account" className="w-[400px]">
-        <TabsList>
+      <Tabs defaultValue="account" className="w-[600px]">
+        <TabsList className="w-full">
           <TabsTrigger value="signup">SignUp</TabsTrigger>
           <TabsTrigger value="login">Login</TabsTrigger>
         </TabsList>
