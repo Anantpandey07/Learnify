@@ -23,7 +23,7 @@ app.use(cookieParser());
 //like JWTs sent from the browser in req.cookies.token.
 
 app.use(cors({
-    origin: "http://localhost:8000",
+    origin: "http://localhost:5173",
     credentials: true
 }));
 //Purpose: Enables CORS (Cross-Origin Resource Sharing).
