@@ -1,19 +1,19 @@
-import {User} from "../models/userModel.js";
+import { User } from "../models/userModel.js";
 import bcrypt from "bcryptjs"
 import { generateToken } from "../utils/generateToken.js";
 
-export const register = async(req, res) =>{
+export const register = async (req, res) => {
     try {
-        const {name, email, password} = req.body;
-        if(!name || !email || !password){
+        const { name, email, password } = req.body;
+        if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required. ",
             })
         }
 
-        const user = await User.findOne({email});
-        if(user){
+        const user = await User.findOne({ email });
+        if (user) {
             return res.status(400).json({
                 success: false,
                 message: "User Already Exist with this Email",
@@ -22,8 +22,8 @@ export const register = async(req, res) =>{
         const hashedPassword = await bcrypt.hash(password, 10);
         await User.create({
             name,
-            email, 
-            password:hashedPassword,
+            email,
+            password: hashedPassword,
         })
         return res.status(201).json({
             success: true,
@@ -38,18 +38,18 @@ export const register = async(req, res) =>{
     }
 };
 
-export const login = async(req, res) => {
+export const login = async (req, res) => {
     try {
-        const {email, password} = await req.body;
-        if(!email || !password){
+        const { email, password } = await req.body;
+        if (!email || !password) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required. ",
             })
         }
 
-        const user = await User.findOne({email});
-        if(!user){
+        const user = await User.findOne({ email });
+        if (!user) {
             return res.status(400).json({
                 success: false,
                 message: "User not Exist, Create a new account",
@@ -57,7 +57,7 @@ export const login = async(req, res) => {
         }
 
         const isPasswordMatch = await bcrypt.compare(password, user.password);
-        if(!isPasswordMatch){
+        if (!isPasswordMatch) {
             return res.status(400).json({
                 success: false,
                 message: "Incorrect Password",
@@ -72,6 +72,70 @@ export const login = async(req, res) => {
         return res.status(500).json({
             success: false,
             mesaage: "Failed to Login"
+        })
+    }
+}
+
+export const logout = async (req, res) => {
+    try {
+        return res.status(200).cookie("token", "", { maxAge: 0 }).json({
+            success: true,
+            message: "Logged Out Successfully !!"
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            mesaage: "Failed to LogOut"
+        })
+    }
+}
+
+
+export const getUserProfile = async (req, res) => {
+    try {
+        const userId = req.id; // we have save user id in req.id in middleware isAuth
+        const user = await User.findById(userId).select("-password");
+        if (!user) {
+            return res.status(404).json({
+                message: "Profile Not Found",
+                success: false,
+            })
+        }
+        return res.status(200).json({
+            success: true,
+            user
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            mesaage: "Failed to Fetch"
+        })
+    }
+}
+
+export const updateProfile = async (req, res) => {
+    try {
+        const userId = req.id;
+        const { name } = req.body;
+        const profilePhoto = req.file;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            console.log(error);
+            return res.status(500).json({
+                success: false,
+                mesaage: "User Not Found"
+            })
+        }
+
+        const updatedData = {name, photoURL};
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            mesaage: "Failed to update"
         })
     }
 }
