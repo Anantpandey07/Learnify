@@ -55,9 +55,9 @@ export default function Profile() {
         return <h1 className='my-30 mx-30 font-bold'>Page is Loading..</h1>
     }
     if (!data || !data.user) {
-        return <h1 className='my-30 mx-30 font-bold text-red-600'>User data not found. || {error}</h1>;
+        return <h1 className='my-30 mx-30 font-bold text-red-600'>User data not found Or Maybe you are not Authenticated</h1>;
     }
-    const { user } = data;
+    const user = data && data.user;
     return (
         <div className='max-w-5xl mx-auto px-4 my-24'>
             <h1 className='font-bold text-2xl text-center md:text-left'>Profile</h1>
