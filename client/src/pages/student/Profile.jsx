@@ -1,26 +1,61 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Dialog,DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger, } from '@/components/ui/dialog'
+import {
+    Dialog, DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Course from './Course'
-import { useLoadUserQuery } from '@/features/api/authApi'
+import { useLoadUserQuery, useUpdateUserMutation } from '@/features/api/authApi'
+import { toast } from 'sonner'
 
 
 export default function Profile() {
+    const [name, setName] = useState("");
+    const [profilePhoto, setProfilePhoto] = useState("");
 
-    const {data, isLoading} = useLoadUserQuery();
-    console.log(data);
+    const { data, isLoading, error, refetch} = useLoadUserQuery(); // refetch is used to fetch data again to show updated data on profile page 
+    const [updateUser, { data: updateUserData, isLoading: updateUserisLoading, error:updateUserError, isSuccess , isError}] = useUpdateUserMutation();
+    // console.log("data:", data);
+    // console.log("error:", error);
+    const onChangeHandler = (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setProfilePhoto(file);
+        }
+    }
+    // console.log(data);
     // const isLoading = false;
-    if(isLoading){
+
+    const updateUserHandler = async () => {
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("profilePhoto", profilePhoto);
+        await updateUser(formData);
+    }
+
+    useEffect(() => {
+        if(isSuccess){
+            refetch(); // after updation it refetches the data on profile page
+            toast.success(data.message || "Profile Updated")
+        }
+        if(isError){
+            toast.error(updateUserError.message || "Some error Occured")
+        }
+    }, [updateUserData, updateUserError, isSuccess, isError])
+
+    if (isLoading) {
         return <h1 className='my-30 mx-30 font-bold'>Page is Loading..</h1>
+    }
+    if (!data || !data.user) {
+        return <h1 className='my-30 mx-30 font-bold text-red-600'>User data not found. || {error}</h1>;
     }
     const { user } = data;
     return (
@@ -58,24 +93,30 @@ export default function Profile() {
                             <DialogHeader>
                                 <DialogTitle>Edit Profile</DialogTitle>
                                 <DialogDescription>
-                                     Make changes to your profile here. Click save when you are
-              done.
+                                    Make changes to your profile here. Click save when you are
+                                    done.
                                 </DialogDescription>
                             </DialogHeader>
                             <div className='grid gap-4 py-4'>
                                 <div className='grid grid-cols-4 items-center gap-4'>
                                     <Label>Name :</Label>
-                                    <Input type="text" placeholder='Your Name' className="col-span-3"></Input>
+                                    <Input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => { setName(e.target.value) }}
+                                        placeholder='Your Name'
+                                        className="col-span-3"
+                                    ></Input>
                                 </div>
                                 <div className='grid grid-cols-4 items-center gap-4'>
                                     <Label>Profile photo :</Label>
-                                    <Input type="file" accept = "image/*" className="col-span-3"></Input>
+                                    <Input onChange={onChangeHandler} type="file" accept="image/*" className="col-span-3"></Input>
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button className="bg-blue-600" disabled ={isLoading}>
+                                <Button onClick={updateUserHandler} className="bg-blue-600" disabled={updateUserisLoading}>
                                     {
-                                        isLoading ? (<><Loader2 className='mr-2 h-4 w-4 animate-spin'/> Please Wait..</>) : "Save Changes"
+                                        updateUserisLoading ? (<><Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please Wait..</>) : "Save Changes"
                                     }
                                 </Button>
                             </DialogFooter>
@@ -87,7 +128,7 @@ export default function Profile() {
                 <h1 className='font-medium text-lg'>Courses You are Enrolled In</h1>
                 <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-5'>
                     {
-                        user?.enrolledCourses.length == 0 ? (<h1 className='text-sm'>You have not enrolled in any courses</h1>) : (user?.enrolledCourses.map((c) => <Course course={c} key={c._id}/>))
+                        user?.enrolledCourses.length == 0 ? (<h1 className='text-sm'>You have not enrolled in any courses</h1>) : (user?.enrolledCourses.map((c) => <Course course={c} key={c._id} />))
                     }
                 </div>
             </div>
