@@ -7,20 +7,22 @@ import DarkMode from "@/DarkMode";
 import { Link, useNavigate } from "react-router-dom";
 import { useLogOutUserMutation } from "@/features/api/authApi";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
-    const user = true;
+    const { user } = useSelector(store => store.auth);
     const navigate = useNavigate();
-    const [logoutUser, {data, isSuccess}] = useLogOutUserMutation();
-    const logOutHandler = async() => {
+    const [logoutUser, { data, isSuccess }] = useLogOutUserMutation();
+    const logOutHandler = async () => {
         await logoutUser();
     }
     useEffect(() => {
-        if(isSuccess){
+        if (isSuccess) {
             toast.success(data.message || "LogOut Successfully!!")
             navigate("/login");
         }
     }, [isSuccess])
+    // console.log(user);
     return (
         <div className="h-16 dark:bg-[#0A0A0A] bg-white dark:border-b border-b border-gray-200 dark:border-gray-800 fixed top-0 left-0 right-0 duration-300 z-10 px-4">
             <div className="max-w-7xl mx-auto flex items-center justify-between h-full">
@@ -39,7 +41,7 @@ const Navbar = () => {
                             <DropdownMenu>
                                 <DropdownMenuTrigger><Avatar className="rounded-lg">
                                     <AvatarImage
-                                        src="https://github.com/evilrabbit.png"
+                                        src={user?.photoURL || "https://github.com/evilrabbit.png"}
                                         alt="@evilrabbit"
                                     />
                                     <AvatarFallback>ER</AvatarFallback>
@@ -49,19 +51,24 @@ const Navbar = () => {
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem><Link to="profile">Edit Profile</Link></DropdownMenuItem>
                                     <DropdownMenuItem><Link to="myLearning">My Learning</Link></DropdownMenuItem>
-                                    <DropdownMenuItem onClick = {logOutHandler}>Log Out</DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>Dashboard</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={logOutHandler}>Log Out</DropdownMenuItem>
+                                    {
+                                        user.role === 'instructor' && (<>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem>Dashboard</DropdownMenuItem>
+                                        </>)
+                                    }
+
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         ) : (
                             <div className="flex items-center gap-2">
-                                <Button variant="outline">Login</Button>
-                                <Button>signup</Button>
+                                <Button onClick={() => { navigate("/login") }} variant="outline">Login</Button>
+                                <Button onClick={() => { navigate("/login") }}>signup</Button>
                             </div>
                         )
                         }
-                        <DarkMode/>
+                        <DarkMode />
                     </div>
                 </div>
             </div>

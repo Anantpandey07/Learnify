@@ -15,7 +15,7 @@ export default function Courses() {
                             <CourseSkeleton key={index} />
                         ))
                     ) : (
-                        courses.map((course, idx)=><Course />)
+                        courses.map((course, idx)=><Course/>)
                     )}
                 </div>
             </div>

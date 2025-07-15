@@ -59,18 +59,15 @@ const Login = () => {
       if(registerIsSucces && registerData){
         toast.success(registerData.message || "SignUp Successful.")
       }
-      // if(!registerIsSucces){
-      //   toast.error(registerData.data.message);
-      // }
       if(registerError){
-        toast.error(registerData?.data?.message || "All fields are required !!");
+        toast.error(registerError?.data?.message || "All fields are required !!");
       }
       if(loginIsSucces && loginData){
         toast.success(loginData.message || "Welcome Back !!")
         navigate("/");
       }
       if(loginError){
-        toast.error(loginData?.data?.message || "Check Email or Password !!")
+        toast.error(loginError?.data?.message || "Check Email or Password !!")
       }
     }, [loginData, registerData, loginError, registerError, loginIsLoading, registerIsLoading])
   return (
