@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./database/db.js";
 import userRoute from "./routes/userRoute.js"
+import courseRoute from "./routes/courseRoute.js"
 dotenv.config();
 connectDB(); 
 const app = express();
@@ -34,6 +35,7 @@ app.use(cors({
 
 // api's
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/course", courseRoute);
 
 // example
 // app.get("/home", (req, res) => {
