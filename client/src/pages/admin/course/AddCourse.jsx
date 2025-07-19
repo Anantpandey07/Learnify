@@ -29,6 +29,9 @@ export default function AddCourse() {
   useEffect(() =>{
     if(isSuccess){
       toast.success(data?.message || "Course Created Successfully");
+      navigate('/admin/courses');
+      // to get the updated courses on courseTable Page we have to write refetch logic 
+      // which is written in courseApi.js
     }
     if(error){
       toast.error(error?.message || "Some error occured")
