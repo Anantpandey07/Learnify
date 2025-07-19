@@ -1,8 +1,4 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import { Button } from './components/ui/button'
 import Login from './pages/login'
 import Navbar from './components/Navbar'
 import HeroSection from './pages/student/HeroSection'
@@ -12,6 +8,10 @@ import { RouterProvider } from 'react-router'
 import Courses from './pages/student/Courses'
 import MyLearning from './pages/student/MyLearning'
 import Profile from './pages/student/Profile'
+import Dashboard from './pages/admin/Dashboard'
+import Sidebar from './pages/admin/sidebar'
+import CourseTable from './pages/admin/course/CourseTable'
+import AddCourse from './pages/admin/course/AddCourse'
 
 const appRouter = createBrowserRouter([
   {
@@ -42,6 +42,25 @@ const appRouter = createBrowserRouter([
       {
         path:'/profile',
         element:<Profile/>
+      },
+      // admin path from here
+      {
+        path:'admin',
+        element:<Sidebar/>,
+        children:[
+          {
+            path:'dashboard',
+            element:<Dashboard/>
+          },
+          {
+            path:'courses',
+            element:<CourseTable/>
+          },
+          {
+            path:'courses/create',
+            element: <AddCourse/>
+          }
+        ]
       },
     ]
   }

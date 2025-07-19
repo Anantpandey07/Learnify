@@ -2,13 +2,18 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/authSlice"
 import rootReducer from "./rootReducer";
 import { authApi } from "@/features/api/authApi";
+import { courseApi } from "@/features/api/courseApi";
 
 
 export const appStore = configureStore({
     reducer: rootReducer,
     // defaultMiddleware = dM
-    middleware: (dM) => dM().concat(authApi.middleware)
+    middleware: (dM) => dM().concat(authApi.middleware, courseApi.middleware)
 });
+
+
+
+
 
 // You're manually dispatching an RTK Query loadUser endpoint call using Redux Toolkit’s store.dispatch. This is often used when you want to:
 // Preload data (e.g., user info on app startup)
