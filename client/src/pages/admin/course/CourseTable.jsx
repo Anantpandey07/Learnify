@@ -36,7 +36,7 @@ export default function CourseTable() {
                             <TableCell className="font-medium">{course?.coursePrice || "NA"}</TableCell>
                             <TableCell><Badge>{course.isPublished ? "Published" : "Draft"}</Badge></TableCell>
                             <TableCell>{course.courseTitle}</TableCell>
-                            <TableCell className="text-right"><Button size="sm" variant="outline"><Edit2/></Button></TableCell>
+                            <TableCell className="text-right"><Button onClick = {() => {navigate(`${course._id}`)}} size="sm" variant="outline"><Edit2/></Button></TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
