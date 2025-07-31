@@ -1,28 +1,32 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useLectureCreateMutation } from '@/features/api/courseApi'
+import { useGetCourseLectureQuery, useLectureCreateMutation } from '@/features/api/courseApi'
 import { Label } from '@radix-ui/react-dropdown-menu'
 import { Loader2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import Lecture from './Lecture'
 
 export default function CreateLecture() {
     const params = useParams();
     const courseId = params.courseId;
     const [lectureTitle, setLectureTitle] = useState("");
     const navigate = useNavigate();
-    const [lectureCreate, {data, isSuccess, isLoading, error}] = useLectureCreateMutation();
+    const [lectureCreate, { data, isSuccess, isLoading, error }] = useLectureCreateMutation();
+
+    const { data: lectureData, isLoading: lectureLoading, isError: lectureError, refetch} = useGetCourseLectureQuery(courseId);
 
     const createLectureHandler = async () => {
-        await lectureCreate ({lectureTitle, courseId})
+        await lectureCreate({ lectureTitle, courseId })
     };
 
     useEffect(() => {
-        if(isSuccess){
+        if (isSuccess) {
+            refetch();
             toast.success(data.message);
         }
-        if(error){
+        if (error) {
             toast.error(error.data.message);
         }
     }, [isSuccess, error])
@@ -45,6 +49,18 @@ export default function CreateLecture() {
                             isLoading ? (<><Loader2 className=' mr-2 h-4 w-4 animate-spin' /> Please Wait..</>) : 'Create'
                         }
                     </Button>
+                </div>
+                <div className='mt-10'>
+                    {
+                        lectureLoading ? (<p>Lecture Loading ...</p>) : lectureError ? (<p>Failed to load lectures.</p>) : lectureData.lectures.length === 0 ? <p>No Lectures Available</p>
+                        : (
+                            
+                            lectureData.lectures.map((lecture, idx) => {
+                               return <Lecture key={lecture._id} lecture={lecture} courseId={courseId} index = {idx}/>
+                            })
+                            
+                        )
+                    }
                 </div>
             </div>
         </div>
