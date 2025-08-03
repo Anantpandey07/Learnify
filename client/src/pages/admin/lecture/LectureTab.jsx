@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { Switch } from '@/components/ui/switch'
-import { useEditLectureMutation, useRemoveLectureMutation } from '@/features/api/courseApi'
+import { useEditLectureMutation, useGetLectureByIdQuery, useRemoveLectureMutation } from '@/features/api/courseApi'
 import { Label } from '@radix-ui/react-dropdown-menu'
 import axios from 'axios'
 import { Loader2 } from 'lucide-react'
@@ -27,6 +27,16 @@ export default function LectureTab() {
 
     const [editLecture, {data, isLoading, error, isSuccess}] = useEditLectureMutation();
     const [removeLecture, {data: removeData, isLoading:removeLoading, isSuccess: removeSuccess}] = useRemoveLectureMutation();
+
+    const {data:lectureData} = useGetLectureByIdQuery(lectureId);
+    const lecture = lectureData?.lecture;
+    useEffect(() => {
+        if(lecture){
+            setLectureTitle(lecture.lectureTitle);
+            setIsFree(lecture.isPreviewFree);
+            setUploadVideoInfo(lecture.videoInfo);
+        }
+    }, [lecture])
 
     const fileChangeHandler = async (e) => {
         const file = e.target.files[0];
@@ -87,7 +97,7 @@ export default function LectureTab() {
                     <CardDescription>Edit here. Click save when you done</CardDescription>
                 </div>
                 <div className='flex items-center gap-2'>
-                    <Button disable={removeLoading} variant="destructive" onClick = {removeLecHandler}>
+                    <Button disabled={removeLoading} variant="destructive" onClick = {removeLecHandler}>
                         {
                             (removeLoading) ? <><Loader2 className='sm animate-spin'/>Loading...</> : ("Remove Lecture")
                         }
@@ -115,7 +125,8 @@ export default function LectureTab() {
                     />
                 </div>
                 <div className='flex items-center space-x-2 my-5'>
-                    <Switch id="free-video"/>
+                    <Switch id="free-video" checked={isFree}
+        onCheckedChange={setIsFree}/>
                     <Label htmlFor = "free-video">Is this video FREE</Label>
                 </div>
                 {
@@ -127,7 +138,11 @@ export default function LectureTab() {
                     )
                 }
                 <div className='mt-4'>
-                    <Button onClick = {editLecHandle}>Update Lecture</Button>
+                    <Button disabled = {isLoading} onClick = {editLecHandle}>
+                        {
+                            (isLoading) ? <><Loader2 className='sm animate-spin'/>Loading...</> : ("Update Changes")
+                        }
+                    </Button>
                 </div>
             </CardContent>
         </Card>

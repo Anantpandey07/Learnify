@@ -17,3 +17,4 @@ export default function Lecture({lecture, courseId, index}) {
     </div>
   )
 }
+
