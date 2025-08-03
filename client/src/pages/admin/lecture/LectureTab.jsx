@@ -3,21 +3,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { Switch } from '@/components/ui/switch'
+import { useEditLectureMutation, useRemoveLectureMutation } from '@/features/api/courseApi'
 import { Label } from '@radix-ui/react-dropdown-menu'
 import axios from 'axios'
-import React, { useState } from 'react'
+import { Loader2 } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 
 const MEDIA_API = "http://localhost:8000/api/v1/media";
 
 export default function LectureTab() {
 
-    const [title, setTitle] = useState("");
+    const [lectureTitle, setLectureTitle] = useState("");
     const [uploadVideoInfo, setUploadVideoInfo] = useState(null);
     const [isFree, setIsFree] = useState(false);
     const [mediaProgress, setMediaProgress] = useState(false);
     const [uploadProgress, setUploadProgress]= useState(0);
     const [btnDisable, setBtnDisable] = useState(true);
+
+    const params = useParams();
+    const {courseId, lectureId} = params;
+
+    const [editLecture, {data, isLoading, error, isSuccess}] = useEditLectureMutation();
+    const [removeLecture, {data: removeData, isLoading:removeLoading, isSuccess: removeSuccess}] = useRemoveLectureMutation();
 
     const fileChangeHandler = async (e) => {
         const file = e.target.files[0];
@@ -46,6 +55,29 @@ export default function LectureTab() {
             }
         }
     }
+
+    const editLecHandle = async () => {
+        // alert("Working");
+        await editLecture({lectureTitle, videoInfo:uploadVideoInfo, isPreviewFree:isFree, courseId, lectureId}) 
+    }
+
+    useEffect(() =>{
+        if(isSuccess){
+            toast.success(data.message);
+        }
+        if(error){
+            toast.error(error.data.message);
+        }
+    }, [isSuccess, error]);
+
+    const removeLecHandler = async () => {
+        removeLecture(lectureId);
+    }
+    useEffect(() =>{
+        if(removeSuccess){
+            toast.success(removeData.message);
+        }
+    }, [removeSuccess]);
   return (
     <div>
         <Card className='mt-6'>
@@ -55,7 +87,11 @@ export default function LectureTab() {
                     <CardDescription>Edit here. Click save when you done</CardDescription>
                 </div>
                 <div className='flex items-center gap-2'>
-                    <Button variant="destructive">Remove Lecture</Button>
+                    <Button disable={removeLoading} variant="destructive" onClick = {removeLecHandler}>
+                        {
+                            (removeLoading) ? <><Loader2 className='sm animate-spin'/>Loading...</> : ("Remove Lecture")
+                        }
+                        </Button>
                 </div>
             </CardHeader>
             <CardContent>
@@ -63,6 +99,8 @@ export default function LectureTab() {
                     <Label>Title</Label>
                     <Input
                     type="text"
+                    value = {lectureTitle}
+                    onChange = {(e) => (setLectureTitle(e.target.value))}
                     placeholder = "Ex. Introduction to JAVA"
                     />
                 </div>
@@ -89,7 +127,7 @@ export default function LectureTab() {
                     )
                 }
                 <div className='mt-4'>
-                    <Button>Update Lecture</Button>
+                    <Button onClick = {editLecHandle}>Update Lecture</Button>
                 </div>
             </CardContent>
         </Card>

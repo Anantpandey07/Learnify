@@ -168,7 +168,7 @@ export const getCourseLecture = async (req, res) => {
 
 export const editLecture = async (req, res) => {
     try {
-        const {lectureTitle, videoInfo, isPreviewFree} = req.body();
+        const {lectureTitle, videoInfo, isPreviewFree} = req.body;
         const {courseId, lectureId} = req.params;
         const lecture = await Lecture.findById(lectureId);
 
@@ -255,7 +255,7 @@ export const getLectureById = async (req, res) => {
         return res.status(200).json({
             lecture,
         })
-        
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
