@@ -1,11 +1,50 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@radix-ui/react-dropdown-menu'
-import React from 'react'
+import React, { useState } from 'react'
+import { toast } from 'sonner'
+
+const MEDIA_API = "http://localhost:8000/api/v1/media";
 
 export default function LectureTab() {
+
+    const [title, setTitle] = useState("");
+    const [uploadVideoInfo, setUploadVideoInfo] = useState(null);
+    const [isFree, setIsFree] = useState(false);
+    const [mediaProgress, setMediaProgress] = useState(false);
+    const [uploadProgress, setUploadProgress]= useState(0);
+    const [btnDisable, setBtnDisable] = useState(true);
+
+    const fileChangeHandler = async (e) => {
+        const file = e.target.files[0];
+        if(file){
+            const formData = new FormData();
+            formData.append("file", file);
+            setMediaProgress(true);
+            try {
+                const res = await axios.post(`${MEDIA_API}/upload-media`, formData, {
+                    onUploadProgress: ({loaded, total}) => {
+                        setUploadProgress(Math.round((loaded *100)/ total));
+                    }
+                });
+
+                if(res.data.success){
+                    console.log(res);
+                    setUploadVideoInfo({videoUrl : res.data.data.url, publicId: res.data.data.public_id});
+                    setBtnDisable(false);
+                    toast.success(res.data.message);
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error("Video Upload Failed");
+            } finally {
+                setMediaProgress(false);
+            }
+        }
+    }
   return (
     <div>
         <Card className='mt-6'>
@@ -31,6 +70,7 @@ export default function LectureTab() {
                     <Input
                     type="file"
                     accept= "video/*"
+                    onChange = {fileChangeHandler}
                     placeholder = "Ex. Introduction to JAVA"
                     className='w-fit'
                     />
@@ -39,6 +79,14 @@ export default function LectureTab() {
                     <Switch id="free-video"/>
                     <Label htmlFor = "free-video">Is this video FREE</Label>
                 </div>
+                {
+                    mediaProgress && (
+                        <div className='my-4'>
+                            <Progress value={uploadProgress}/>
+                            <p>{uploadProgress}% uploaded</p>
+                        </div>
+                    )
+                }
                 <div className='mt-4'>
                     <Button>Update Lecture</Button>
                 </div>
