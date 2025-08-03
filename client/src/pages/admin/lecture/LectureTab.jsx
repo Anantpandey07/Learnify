@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@radix-ui/react-dropdown-menu'
+import axios from 'axios'
 import React, { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -32,7 +33,7 @@ export default function LectureTab() {
                 });
 
                 if(res.data.success){
-                    console.log(res);
+                    // console.log(res);
                     setUploadVideoInfo({videoUrl : res.data.data.url, publicId: res.data.data.public_id});
                     setBtnDisable(false);
                     toast.success(res.data.message);
