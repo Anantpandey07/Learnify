@@ -29,9 +29,9 @@ const Navbar = () => {
                 {/* Logo and Branding */}
                 <div className="flex items-center gap-2">
                     <School size={28} className="text-blue-600 dark:text-white" />
-                    <h1 className="hidden md:block font-extrabold text-2xl text-gray-900 dark:text-white">
+                    <Link to ={'/'}><h1 className="hidden md:block font-extrabold text-2xl text-gray-900 dark:text-white">
                         Learnify
-                    </h1>
+                    </h1></Link>
                 </div>
 
                 {/* Right Side - Profile / Mobile Menu */}
