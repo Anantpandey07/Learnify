@@ -64,7 +64,7 @@ export default function CourseTab() {
         }
     }
     const updateCourseHandler = async () => {
-        // console.log(input);
+        console.log(input);
         const formData = new FormData();
         formData.append("courseTitle", input.courseTitle);
         formData.append("subTitle", input.subTitle);
@@ -75,6 +75,14 @@ export default function CourseTab() {
         formData.append("courseThumbnail", input.courseThumbnail);
         await editCourse({ formData, courseId });
     }
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success(data.message || "Course Updated Successfully !!")
+        }
+        if (error) {
+            toast.error(error.data.message || "Failed to update")
+        }
+    }, [isSuccess, error])
 
     const publishStatusHandler = async(action) => {
         try {
@@ -87,15 +95,6 @@ export default function CourseTab() {
             toast.error("Failed to publish or unpublish course");
         }
     }
-
-    useEffect(() => {
-        if (isSuccess) {
-            toast.success(data.message || "Course Updated Successfully !!")
-        }
-        if (error) {
-            toast.error(error.data.message || "Failed to update")
-        }
-    }, [isSuccess, error])
 
     if(courseByIdLoading) return <><Loader2 className='h-4 w-4 animate-spin'/> Loading..</> 
     return (

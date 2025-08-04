@@ -73,7 +73,7 @@ export const editCourse = async (req, res) =>{
             courseThumbnail = await uploadMedia(thumbnail.path);
         }
 
-        const updateData = {courseTitle, subTitle, description, category, courseLevel, coursePrice, courseThumbnai: courseThumbnail?.secure_url};
+        const updateData = {courseTitle, subTitle, description, category, courseLevel, coursePrice, courseThumbnail: courseThumbnail?.secure_url};
 
         course = await Course.findByIdAndUpdate(courseId, updateData, {new:true});
 
@@ -162,6 +162,26 @@ export const getCourseLecture = async (req, res) => {
         console.log(error);
         return res.status(500).json({
             message: "Failed to get Lectures"
+        })
+    }
+}
+
+export const getPublishedCourse = async(req, res) => {
+    try {
+        const courses = await Course.find({isPublished:true}).populate({path:"creator", select:"name photoUrl"});
+        if(!courses){
+            return res.status(404).json({
+                message:"Course Not Found."
+            })
+        }
+
+        return res.status(200).json({
+            courses,
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message:"Error in fetching published course."
         })
     }
 }
