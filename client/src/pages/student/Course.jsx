@@ -27,7 +27,7 @@ export default function Course({course}) {
           <Badge className="bg-blue-600 text-white px-2 py-1 text-xs rounded-full">{course.courseLevel}</Badge>
         </div>
         <div className='text-xl font-bold'>
-          <span>{course.coursePrice}</span>
+          <span>₹{course.coursePrice}</span>
         </div>
       </CardContent>
     </Card>

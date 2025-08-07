@@ -1,10 +1,10 @@
-import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const Course_API = "http://localhost:8000/api/v1/course/";
 
 export const courseApi = createApi({
     reducerPath: "courseApi",
-    tagTypes:['Refetch_Course', 'Refetch_Lecture'], // for refetching data on courseTable on addition of new course
+    tagTypes: ['Refetch_Course', 'Refetch_Lecture'], // for refetching data on courseTable on addition of new course
     // Automatically refetch or invalidate specific API cache data when a mutation (like POST, PUT, DELETE) changes related data.
     baseQuery: fetchBaseQuery({
         baseUrl: Course_API,
@@ -12,22 +12,44 @@ export const courseApi = createApi({
     }),
     endpoints: (builder) => ({
         createCourse: builder.mutation({
-            query: ({courseTitle, category}) =>({
+            query: ({ courseTitle, category }) => ({
                 url: "",
                 method: "POST",
-                body: {courseTitle, category},
+                body: { courseTitle, category },
             }),
-            invalidatesTags: ['Refetch_Course'], 
+            invalidatesTags: ['Refetch_Course'],
         }),
         getCreatorCourse: builder.query({
             query: () => ({
                 url: "",
                 method: "GET"
             }),
-            providesTags: ['Refetch_Course'], 
+            providesTags: ['Refetch_Course'],
         }),
-        editCourse :builder.mutation({
-            query: ({formData, courseId}) => ({
+        getSearchCourse: builder.query({
+            query: ({ searchQuery, categories, sortByPrice }) => {
+                // Build qiery string
+                let queryString = `/search?query=${encodeURIComponent(searchQuery)}`
+
+                // append cateogry 
+                if (categories && categories.length > 0) {
+                    const categoriesString = categories.map(encodeURIComponent).join(",");
+                    queryString += `&categories=${categoriesString}`;
+                }
+
+                // Append sortByPrice if available
+                if (sortByPrice) {
+                    queryString += `&sortByPrice=${encodeURIComponent(sortByPrice)}`;
+                }
+
+                return {
+                    url: queryString,
+                    method: "GET",
+                }
+            }
+        }),
+        editCourse: builder.mutation({
+            query: ({ formData, courseId }) => ({
                 url: `/${courseId}`,
                 method: "PUT",
                 body: formData,
@@ -41,10 +63,10 @@ export const courseApi = createApi({
             })
         }),
         lectureCreate: builder.mutation({
-            query: ({lectureTitle, courseId}) => ({
+            query: ({ lectureTitle, courseId }) => ({
                 url: `/${courseId}/lecture`,
                 method: "POST",
-                body: {lectureTitle}
+                body: { lectureTitle }
             })
         }),
         getCourseLecture: builder.query({
@@ -54,15 +76,15 @@ export const courseApi = createApi({
             }),
             providesTags: ['Refetch_Lecture'],
         }),
-        editLecture : builder.mutation({
-            query: ({lectureTitle, videoInfo, isPreviewFree,courseId, lectureId}) => ({
+        editLecture: builder.mutation({
+            query: ({ lectureTitle, videoInfo, isPreviewFree, courseId, lectureId }) => ({
                 url: `/${courseId}/lecture/${lectureId}`,
                 method: "POST",
-                body: {lectureTitle, videoInfo, isPreviewFree}
+                body: { lectureTitle, videoInfo, isPreviewFree }
             }),
             invalidatesTags: ['Refetch_Lecture'],
         }),
-        removeLecture : builder.mutation({
+        removeLecture: builder.mutation({
             query: (lectureId) => ({
                 url: `/lecture/${lectureId}`,
                 method: "DELETE",
@@ -76,15 +98,15 @@ export const courseApi = createApi({
             })
         }),
         publishCourse: builder.mutation({
-            query: ({courseId, query}) => ({
+            query: ({ courseId, query }) => ({
                 url: `/${courseId}?publish=${query}`,
                 method: "PATCH",
             })
         }),
         getPublishedCourse: builder.query({
-            query: () =>({
+            query: () => ({
                 url: `/published-courses`,
-                method:'GET',
+                method: 'GET',
             })
         })
     })
@@ -108,4 +130,5 @@ export const {
     useGetLectureByIdQuery,
     usePublishCourseMutation,
     useGetPublishedCourseQuery,
+    useGetSearchCourseQuery,
 } = courseApi;
