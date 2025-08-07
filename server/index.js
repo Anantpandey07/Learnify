@@ -7,6 +7,7 @@ import userRoute from "./routes/userRoute.js"
 import courseRoute from "./routes/courseRoute.js"
 import mediaRoute from "./routes/mediaRoute.js";
 import purchaseCourseRoute from "./routes/purchaseCourseRoute.js";
+import courseProgressRoute from "./routes/courseProgress.route.js"
 dotenv.config();
 connectDB(); 
 const app = express();
@@ -40,6 +41,7 @@ app.use("/api/v1/media", mediaRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/course", courseRoute);
 app.use("/api/v1/purchase", purchaseCourseRoute);
+app.use("/api/v1/progress", courseProgressRoute);
 
 // example
 // app.get("/home", (req, res) => {
