@@ -1,20 +1,38 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Filter from './Filter'
 import SearchResult from './SearchResult';
+import { useGetSearchCourseQuery } from '@/features/api/courseApi';
+import { useSearchParams } from 'react-router-dom';
+import { AlertCircle, Link } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function SearchPage() {
-    const isLoading = false;
-    const isEmpty = false;
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("query");
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [sortByPrice, setSortByPrice] = useState("");
+  const {data, isLoading} = useGetSearchCourseQuery({
+    searchQuery:query,
+    categories:selectedCategories,
+    sortByPrice
+  });
+  // const isLoading = false;
+  const isEmpty = !isLoading && data?.courses.length === 0;
+
+  const handleFilterChange = (categories, price) => {
+    setSelectedCategories(categories);
+    setSortByPrice(price);
+  }
   return (
     <div className='mt-18 max-w-7xl mx-auto p-4 md:p-8'>
         <div>
-            <h1>result for "html"</h1>
+            <h1 className='font-bold text-xl md:text-2xl'>result for "{query}"</h1>
             <p>Showing Results for {" "}
-                <span className='text-blue-800 font-bold italic'>Frontend Developer</span>
+                <span className='text-blue-800 font-bold italic'>{query}</span>
             </p>
         </div>
         <div className='flex flex-col md:flex-row gap-10'>
-            <Filter/>
+            <Filter handleFilterChange={handleFilterChange}/>
             <div className='flex-1'>
                 {
                     isLoading ? (
@@ -22,8 +40,8 @@ export default function SearchPage() {
                             <CourseSkeleton key={idx}/>
                         })
                     ) : isEmpty ? (<CourseNotFound/>) : (
-                        [1,2,3].map((_, idx) => (
-                            <SearchResult key={idx}/>
+                        data?.courses?.map((course) => (
+                            <SearchResult course={course} key={course._id}/>
                         ))
                     )
                 }

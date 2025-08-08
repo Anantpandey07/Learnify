@@ -96,7 +96,7 @@ export const logout = async (req, res) => {
 export const getUserProfile = async (req, res) => {
     try {
         const userId = req.id; // we have save user id in req.id in middleware isAuth
-        const user = await User.findById(userId).select("-password");
+        const user = await User.findById(userId).select("-password").populate("enrolledCourses");
         if (!user) {
             return res.status(404).json({
                 message: "Profile Not Found",

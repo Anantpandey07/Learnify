@@ -28,7 +28,7 @@ export const courseApi = createApi({
         }),
         getSearchCourse: builder.query({
             query: ({ searchQuery, categories, sortByPrice }) => {
-                // Build qiery string
+                // Build query string
                 let queryString = `/search?query=${encodeURIComponent(searchQuery)}`
 
                 // append cateogry 
